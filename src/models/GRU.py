@@ -91,20 +91,26 @@ def train_model():
     project_root = os.path.dirname(src_dir)
     data_dir = os.path.join(project_root, "data")
 
-    all_files = sorted(glob.glob(os.path.join(data_dir, "*.csv")))
-    train_split = int(0.9 * len(all_files))
-    val_split = int(0.05 * len(all_files))
-    train_paths = all_files[:train_split]
-    val_paths = all_files[train_split:train_split + val_split]
-    test_paths = all_files[train_split + val_split:]
+    # ==== 加载 train 和 test 文件夹中的 CSV 文件 ====
+    train_dir = os.path.join(data_dir, "train")
+    test_dir = os.path.join(data_dir, "test")
+    train_paths = sorted(glob.glob(os.path.join(train_dir, "*.csv")))
+    test_paths = sorted(glob.glob(os.path.join(test_dir, "*.csv")))
 
-    train_dfs = [pd.read_csv(f) for f in train_paths]
+    # === 拆出验证集（可选 5% 验证） ===
+    val_split = int(0.05 * len(train_paths))
+    val_paths = train_paths[:val_split]
+    actual_train_paths = train_paths[val_split:]
+
+    # === 统一归一化器 fit 训练集数据 ===
+    train_dfs = [pd.read_csv(f) for f in actual_train_paths]
     scaler = MinMaxScaler()
     scaler.fit(pd.concat(train_dfs)[["Time (s)", "T_outer (C)", "T_inner (C)", "T_ave (C)"]])
 
-    train_datasets = [ThermalDataset(f, scaler=scaler) for f in train_paths]
+    train_datasets = [ThermalDataset(f, scaler=scaler) for f in actual_train_paths]
     val_datasets = [ThermalDataset(f, scaler=scaler) for f in val_paths]
     test_datasets = [ThermalDataset(f, scaler=scaler) for f in test_paths]
+
     train_loader = DataLoader(ConcatDataset(train_datasets), batch_size=16, shuffle=True)
     val_loader = DataLoader(ConcatDataset(val_datasets), batch_size=16)
 
