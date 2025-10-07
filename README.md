@@ -14,9 +14,6 @@ The following models were tested, each with a brief description:
 ## Model Results
 All model results are available in the `results` folder. We tested five cases with thermal input patterns that differ significantly from the training data to assess whether the models capture the underlying physical behaviors of thermal energy dynamics rather than merely interpolating from training data. This ensures robustness against real-world thermal variations. Below are two example results from the GRU model, where initial predictions are slightly off, likely due to the chosen loss function.
 
-![Case 1](results/gru_results/Figure_1.png)
-
-![Case 4](results/gru_results/Figure_4.png)
 
 Below is a table of training and testing times. At this stage, testing times are more relevant, as training occurs only once. Additionally, since the feature set is currently limited, the recorded times are less critical than they will be in future iterations. That said, all models complete testing in under a second—significantly faster than traditional simulations, which can take approximately 10 minutes.
 
